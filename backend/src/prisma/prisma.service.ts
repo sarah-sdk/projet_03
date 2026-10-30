@@ -1,7 +1,7 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaMariaDb } from '@prisma/adapter-mariadb';
-import { PrismaClient } from '@prisma/client/extension';
+import { PrismaClient } from '../generated/prisma/client.js';
 
 @Injectable()
 export class PrismaService
@@ -20,6 +20,6 @@ export class PrismaService
   }
 
   async onModuleDestroy() {
-    await this.$disconnet();
+    await this.$disconnect();
   }
 }
