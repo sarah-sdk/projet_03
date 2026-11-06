@@ -14,15 +14,7 @@ export class UsersService {
     return this.usersRepository.findById(id);
   }
 
-  findAll(
-    params: {
-      skip?: number;
-      take?: number;
-      cursor?: Prisma.usersWhereUniqueInput;
-      where?: Prisma.usersWhereInput;
-      orderBy?: Prisma.usersOrderByWithRelationInput;
-    } = {},
-  ): Promise<users[]> {
+  findAll(params: Prisma.usersFindManyArgs = {}): Promise<users[]> {
     return this.usersRepository.findAll(params);
   }
 

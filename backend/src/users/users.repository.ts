@@ -6,26 +6,19 @@ import { Prisma, users } from '../generated/prisma/client.js';
 export class UsersRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findByEmail(email: string): Promise<users | null> {
+  findByEmail(email: string): Promise<users | null> {
     return this.prisma.users.findUnique({ where: { email } });
   }
 
-  async findById(id: number): Promise<users | null> {
+  findById(id: number): Promise<users | null> {
     return this.prisma.users.findUnique({ where: { id } });
   }
 
-  async findAll(
-    params: {
-      skip?: number;
-      take?: number;
-      where?: Prisma.usersWhereInput;
-      orderBy?: Prisma.usersOrderByWithRelationInput;
-    } = {},
-  ): Promise<users[]> {
+  findAll(params: Prisma.usersFindManyArgs = {}): Promise<users[]> {
     return this.prisma.users.findMany(params);
   }
 
-  async create(data: Prisma.usersCreateInput): Promise<users> {
+  create(data: Prisma.usersCreateInput): Promise<users> {
     return this.prisma.users.create({ data });
   }
 }
