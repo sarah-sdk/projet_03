@@ -1,10 +1,20 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  ParseIntPipe,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { RentalsService } from './rentals.service.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import {
   ApiBearerAuth,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiParam,
   ApiQuery,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -68,5 +78,44 @@ export class RentalsController {
       created_at: rental.created_at,
       updated_at: rental.updated_at,
     }));
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Récupérer une location par son ID' })
+  @ApiParam({
+    name: 'id',
+    type: Number,
+    description: 'Identifiant de la location',
+  })
+  @ApiOkResponse({
+    description: 'Location récupérée avec succès',
+    type: RentalResponseDto,
+  })
+  @ApiNotFoundResponse({
+    description: 'Location introuvable',
+  })
+  async findById(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<RentalResponseDto | null> {
+    const rental = await this.rentalsService.findById(id);
+
+    if (!rental) {
+      throw new NotFoundException('Location introuvable');
+    }
+
+    return {
+      id: rental.id,
+      name: rental.name,
+      surface: rental.surface.toString(),
+      price: rental.price.toString(),
+      picture: rental.picture,
+      description: rental.description,
+      owner: {
+        id: rental.users.id,
+        name: rental.users.name,
+      },
+      created_at: rental.created_at,
+      updated_at: rental.updated_at,
+    };
   }
 }

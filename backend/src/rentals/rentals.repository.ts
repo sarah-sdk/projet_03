@@ -32,4 +32,18 @@ export class RentalsRepository {
       },
     });
   }
+
+  findById(id: number): Promise<RentalWithOwner | null> {
+    return this.prisma.rentals.findUnique({
+      where: { id },
+      include: {
+        users: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+  }
 }
