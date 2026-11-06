@@ -16,7 +16,7 @@ export class AuthService {
     const existingUser = await this.usersService.findByEmail(registerDto.email);
 
     if (existingUser) {
-      throw new ConflictException('Cette adresse e-mail est déjà utilisée.');
+      throw new ConflictException('Cette adresse e-mail est déjà utilisée');
     }
 
     const hashedPassword = await hash(registerDto.password, 12);
