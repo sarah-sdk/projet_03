@@ -12,6 +12,14 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
+  #generateToken(user: AuthenticatedUser) {
+    const payload = { email: user.email, sub: user.id };
+
+    return {
+      access_token: this.jwtService.sign(payload),
+    };
+  }
+
   async register(registerDto: RegisterDto) {
     const existingUser = await this.usersService.findByEmail(registerDto.email);
 
@@ -27,9 +35,9 @@ export class AuthService {
       password: hashedPassword,
     });
 
-    const { password, ...result } = user;
+    const { id, email, name } = user;
 
-    return result;
+    return this.#generateToken({ id, email, name });
   }
 
   async validateUser(
@@ -38,23 +46,25 @@ export class AuthService {
   ): Promise<AuthenticatedUser | null> {
     const user = await this.usersService.findByEmail(email);
 
-    if (user) {
-      const isSamePassword = await compare(password, user.password);
-
-      if (isSamePassword) {
-        const { password, ...result } = user;
-        return result;
-      }
+    if (!user) {
+      return null;
     }
 
-    return null;
+    const isSamePassword = await compare(password, user.password);
+
+    if (!isSamePassword) {
+      return null;
+    }
+
+    const { id, email: userEmail, name } = user;
+    return {
+      id,
+      email: userEmail,
+      name,
+    };
   }
 
   async login(user: AuthenticatedUser) {
-    const payload = { email: user.email, sub: user.id };
-
-    return {
-      access_token: this.jwtService.sign(payload),
-    };
+    return this.#generateToken(user);
   }
 }

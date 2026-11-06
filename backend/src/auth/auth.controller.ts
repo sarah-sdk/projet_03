@@ -37,9 +37,7 @@ export class AuthController {
     description: 'Utilisateur créé avec succès',
     schema: {
       example: {
-        id: 1,
-        name: 'Geralt de Riv',
-        email: 'geralt-de-riv@example.com',
+        access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
       },
     },
   })
