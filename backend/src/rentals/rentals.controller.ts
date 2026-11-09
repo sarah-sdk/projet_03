@@ -1,16 +1,21 @@
 import {
+  Body,
   Controller,
   Get,
   NotFoundException,
   Param,
   ParseIntPipe,
+  Post,
   Query,
+  Request,
   UseGuards,
 } from '@nestjs/common';
 import { RentalsService } from './rentals.service.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import {
+  ApiBadRequestResponse,
   ApiBearerAuth,
+  ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
@@ -20,6 +25,8 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { RentalResponseDto } from './dto/rental-response.dto.js';
+import { CreateRentalDto } from './dto/create-rental.dto.js';
+import type { AuthenticatedRequest } from '../auth/types/authenticated-request.type.js';
 
 @ApiTags('Rentals')
 @ApiBearerAuth()
@@ -52,7 +59,7 @@ export class RentalsController {
   async findAll(
     @Query('search') search?: string,
   ): Promise<RentalResponseDto[]> {
-    const rentals = await this.rentalsService.findAll({
+    return this.rentalsService.findAll({
       where: search
         ? {
             OR: [
@@ -63,24 +70,10 @@ export class RentalsController {
         : undefined,
       orderBy: { id: 'asc' },
     });
-
-    return rentals.map((rental) => ({
-      id: rental.id,
-      name: rental.name,
-      surface: rental.surface.toString(),
-      price: rental.price.toString(),
-      picture: rental.picture,
-      description: rental.description,
-      owner: {
-        id: rental.users.id,
-        name: rental.users.name,
-      },
-      created_at: rental.created_at,
-      updated_at: rental.updated_at,
-    }));
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Récupérer une location par son ID' })
   @ApiParam({
     name: 'id',
@@ -96,26 +89,33 @@ export class RentalsController {
   })
   async findById(
     @Param('id', ParseIntPipe) id: number,
-  ): Promise<RentalResponseDto | null> {
+  ): Promise<RentalResponseDto> {
     const rental = await this.rentalsService.findById(id);
 
     if (!rental) {
       throw new NotFoundException('Location introuvable');
     }
 
-    return {
-      id: rental.id,
-      name: rental.name,
-      surface: rental.surface.toString(),
-      price: rental.price.toString(),
-      picture: rental.picture,
-      description: rental.description,
-      owner: {
-        id: rental.users.id,
-        name: rental.users.name,
-      },
-      created_at: rental.created_at,
-      updated_at: rental.updated_at,
-    };
+    return rental;
+  }
+
+  @Post()
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: "Création d'une location" })
+  @ApiCreatedResponse({
+    description: 'Location créée avec succès',
+    type: RentalResponseDto,
+  })
+  @ApiBadRequestResponse({
+    description: 'Les données envoyées sont invalides',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Utilisateur non connecté',
+  })
+  create(
+    @Body() rentalData: CreateRentalDto,
+    @Request() req: AuthenticatedRequest,
+  ): Promise<RentalResponseDto> {
+    return this.rentalsService.create(rentalData, req.user.id);
   }
 }

@@ -46,4 +46,26 @@ export class RentalsRepository {
       },
     });
   }
+
+  create(
+    data: Omit<Prisma.rentalsCreateInput, 'users'>,
+    userId: number,
+  ): Promise<RentalWithOwner> {
+    return this.prisma.rentals.create({
+      data: {
+        ...data,
+        users: {
+          connect: { id: userId },
+        },
+      },
+      include: {
+        users: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+  }
 }

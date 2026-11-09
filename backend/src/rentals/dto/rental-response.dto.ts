@@ -2,10 +2,10 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { RentalOwnerResponseDto } from './rental-owner-response.dto.js';
 
 export class RentalResponseDto {
-  @ApiProperty()
+  @ApiProperty({ example: 42 })
   id: number;
 
-  @ApiProperty()
+  @ApiProperty({ example: 'Appartement cosy' })
   name: string;
 
   @ApiProperty({ example: '45.50' })
@@ -17,7 +17,7 @@ export class RentalResponseDto {
   @ApiPropertyOptional({ nullable: true })
   picture: string | null;
 
-  @ApiProperty()
+  @ApiProperty({ example: 'Bel appartement en centre-ville' })
   description: string;
 
   @ApiProperty({ type: () => RentalOwnerResponseDto })
