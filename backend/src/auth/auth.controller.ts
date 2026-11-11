@@ -1,17 +1,18 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
+  NotFoundException,
   Post,
   Req,
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service.js';
 import { RegisterDto } from './dto/register.dto.js';
-import { Request } from 'express';
 import { LocalAuthGuard } from './local-auth.guard.js';
-import { AuthenticatedUser } from './types/authenticated-user.type.js';
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiConflictResponse,
   ApiCreatedResponse,
@@ -20,10 +21,9 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-
-type AuthentificationRequest = Request & {
-  user: AuthenticatedUser;
-};
+import type { AuthenticatedRequest } from './types/authenticated-request.type.js';
+import { JwtAuthGuard } from './jwt-auth.guard.js';
+import { UserResponseDto } from '../users/dto/user-response.dto.js';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -84,7 +84,28 @@ export class AuthController {
   @ApiUnauthorizedResponse({
     description: 'Identifiants incorrects',
   })
-  async login(@Req() req: AuthentificationRequest) {
+  async login(@Req() req: AuthenticatedRequest) {
     return this.authService.login(req.user);
+  }
+
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Récupérer l'utilisateur connecté" })
+  @ApiOkResponse({
+    description: 'Utilisateur récupéré avec succès',
+    type: UserResponseDto,
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Utilisateur non authentifié ou token invalide',
+  })
+  async getMe(@Req() req: AuthenticatedRequest): Promise<UserResponseDto> {
+    const user = await this.authService.getMe(req.user.id);
+
+    if (!user) {
+      throw new NotFoundException('Utilisateur introuvable');
+    }
+
+    return user;
   }
 }

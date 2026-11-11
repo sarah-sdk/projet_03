@@ -67,4 +67,15 @@ export class AuthService {
   async login(user: AuthenticatedUser) {
     return this.#generateToken(user);
   }
+
+  async getMe(userId: number): Promise<AuthenticatedUser | null> {
+    const user = await this.usersService.findById(userId);
+
+    if (!user) {
+      return null;
+    }
+
+    const { id, email, name } = user;
+    return { id, email, name };
+  }
 }
