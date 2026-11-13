@@ -6,6 +6,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Put,
   Query,
   Request,
   UseGuards,
@@ -17,6 +18,7 @@ import {
   ApiBearerAuth,
   ApiBody,
   ApiCreatedResponse,
+  ApiForbiddenResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
@@ -28,6 +30,7 @@ import {
 import { RentalResponseDto } from './dto/rental-response.dto.js';
 import { CreateRentalDto } from './dto/create-rental.dto.js';
 import type { AuthenticatedRequest } from '../auth/types/authenticated-request.type.js';
+import { UpdateRentalDto } from './dto/update-rental.dto.js';
 
 @ApiTags('Rentals')
 @ApiBearerAuth()
@@ -119,5 +122,33 @@ export class RentalsController {
     @Request() req: AuthenticatedRequest,
   ): Promise<RentalResponseDto> {
     return this.rentalsService.create(rentalData, req.user.id);
+  }
+
+  @Put(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: "Modifier les informations d'une location" })
+  @ApiParam({
+    name: 'id',
+    type: Number,
+    description: 'Identifiant de la location',
+  })
+  @ApiBody({ type: UpdateRentalDto })
+  @ApiOkResponse({
+    description: 'Location modifiée avec succès',
+    type: RentalResponseDto,
+  })
+  @ApiBadRequestResponse({
+    description: 'Les données envoyées sont invalides',
+  })
+  @ApiUnauthorizedResponse({ description: 'Utilisateur non connecté' })
+  @ApiForbiddenResponse({
+    description: "Seul le propriétaire d'une location peut la modifier",
+  })
+  async update(
+    @Param('id', ParseIntPipe) rentalId: number,
+    @Body() rentalData: UpdateRentalDto,
+    @Request() req: AuthenticatedRequest,
+  ): Promise<RentalResponseDto> {
+    return this.rentalsService.update(rentalId, rentalData, req.user.id);
   }
 }

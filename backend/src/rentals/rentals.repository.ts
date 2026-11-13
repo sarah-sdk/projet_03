@@ -68,4 +68,22 @@ export class RentalsRepository {
       },
     });
   }
+
+  update(
+    id: number,
+    data: Prisma.rentalsUpdateInput,
+  ): Promise<RentalWithOwner> {
+    return this.prisma.rentals.update({
+      where: { id },
+      data,
+      include: {
+        users: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+  }
 }
