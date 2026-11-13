@@ -1,132 +1,323 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# ChâTop – Backend API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+API REST de l'application **ChâTop**, développée avec NestJS dans le cadre du Projet 3 de la formation Lead Developer JavaScript d'OpenClassrooms.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+ChâTop est une application de location saisonnière permettant de mettre en relation des locataires et des propriétaires dans une zone touristique.
 
-## Description
+Ce backend permet de gérer les utilisateurs, l'authentification, les locations et les messages échangés entre utilisateurs.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+---
 
-## Project setup
+## 📋 Sommaire
 
-```bash
-$ npm install
+- [Technologies](#-technologies)
+- [Architecture](#-architecture)
+- [Prérequis](#-prérequis)
+- [Installation](#-installation)
+- [Configuration](#-configuration)
+- [Base de données](#-base-de-données)
+- [Lancement du serveur](#-lancement-du-serveur)
+- [Documentation API](#-documentation-api)
+- [Authentification et sécurité](#-authentification-et-sécurité)
+- [Routes disponibles](#-routes-disponibles)
+- [Commandes disponibles](#-commandes-disponibles)
+
+---
+
+## 🛠 Technologies
+
+- **NestJS 12** – Framework backend Node.js
+- **TypeScript 6** – Langage de développement
+- **Prisma 7** – ORM pour l'accès à la base de données
+- **MariaDB** – Base de données relationnelle
+- **Passport / JWT** – Authentification et gestion des accès
+- **bcrypt** – Hachage des mots de passe
+- **class-validator** – Validation des données entrantes
+- **class-transformer** – Transformation des données
+- **Swagger / OpenAPI** – Documentation interactive de l'API
+
+---
+
+## 📂 Architecture
+
+Le backend repose sur une architecture modulaire NestJS avec une séparation des responsabilités entre les contrôleurs, les services et les repositories.
+
+```text
+backend/
+├── prisma/
+│   └── schema.prisma
+│
+├── src/
+│   ├── auth/
+│   ├── users/
+│   ├── rentals/
+│   ├── messages/
+│   ├── prisma/
+│   ├── app.module.ts
+│   └── main.ts
+│
+├── .env
+├── package.json
+├── prisma7.config.ts
+└── README.md
 ```
 
-## Compile and run the project
+Les principaux modules sont :
+
+| Module   | Responsabilité                                |
+| -------- | --------------------------------------------- |
+| Auth     | Authentification et génération des tokens JWT |
+| Users    | Gestion des utilisateurs                      |
+| Rentals  | Gestion des locations                         |
+| Messages | Gestion des messages                          |
+| Prisma   | Accès à la base de données                    |
+
+Chaque module métier sépare les responsabilités entre :
+
+- **Controller** : réception des requêtes HTTP et transmission des réponses.
+- **Service** : gestion de la logique métier.
+- **Repository** : accès aux données via Prisma.
+
+---
+
+## 📦 Prérequis
+
+Avant de commencer, assurez-vous de disposer des éléments suivants :
+
+- **Node.js** 22 LTS ou supérieur
+- **npm**
+- **MariaDB** compatible avec l'adaptateur Prisma utilisé
+- **Git**
+
+---
+
+## 🚀 Installation
+
+### 1. Cloner le repository
+
+Depuis le terminal :
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+git clone <url-du-repository>
+cd <nom-du-repository>/backend
 ```
 
-## Run tests
+### 2. Installer les dépendances
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm install
 ```
 
-## Deployment
+### 3. Configurer les variables d'environnement
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+Créer un fichier `.env` à la racine du dossier `backend` à l'aide du fichier `.env.example`.
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+cp .env.example .env
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+Renseigner les variables nécessaires à la connexion à la base de données et à l'authentification.
 
-## Observability
+Voir la section [Configuration](#-configuration).
 
-In production applications, observability is essential for understanding how your system behaves, detecting issues early, and maintaining reliable performance.
-
-[NestJS Observe](https://observe.nestjs.com) automatically instruments your NestJS application, giving you deep visibility into your system with minimal setup:
-
-- **Distributed tracing:** Follow requests across services and understand how they flow through your system.
-- **Waterfall analysis:** Visualize request execution and identify slow operations, bottlenecks, and unexpected delays.
-- **Performance analysis:** Analyze application performance in real time and quickly pinpoint areas that need optimization.
-- **Metrics:** Track key application and infrastructure metrics to understand system health and performance trends.
-- **Logging:** Centralize and correlate logs with traces and other telemetry to make debugging easier.
-- **Error tracking:** Detect errors quickly and investigate their root causes with the surrounding context.
-- **SLA monitoring:** Track service-level objectives and identify when your application is approaching or exceeding defined thresholds.
-- **Alarms and alerts:** Set up alerts for critical errors, performance degradation, SLA violations, and other anomalies so your team can react quickly.
-
-To add it to this project, run this and approve the code it prints at [observe.nestjs.com/link](https://observe.nestjs.com/link) - signing up for free if you have no account:
+### 4. Générer le client Prisma
 
 ```bash
-$ npx @nestjs/observe link
+npx prisma generate
 ```
 
-It installs `@nestjs/observe`, wires it into `AppModule` and `main.ts`, and writes the app key and secret into `.env`, which every `nest start` script (`start`, `start:dev`, `start:debug`) then loads. In production, set `OBSERVE_APP_KEY` and `OBSERVE_APP_SECRET` in the environment instead.
+Cette commande génère le client Prisma à partir du schéma défini dans `prisma/schema.prisma`.
 
-Or do it by hand:
+---
+
+## ⚙️ Configuration
+
+Le backend utilise des variables d'environnement pour gérer les paramètres de connexion à la base de données et les informations sensibles.
+
+Créer un fichier `.env` à la racine du backend à l'aide du fichier `.env.example`.
+
+Adapter les valeurs à votre environnement local.
+
+**Sécurité :**
+
+- Le fichier `.env` ne doit jamais être versionné.
+- Le secret JWT doit être suffisamment robuste.
+- Les identifiants de connexion à la base de données ne doivent jamais être exposés.
+
+---
+
+## 🗄 Base de données
+
+L'application utilise **MariaDB** avec **Prisma 7** comme ORM.
+
+### Structure de la base de données
+
+La base repose sur trois entités principales :
+
+| Entité     | Description                                    |
+| ---------- | ---------------------------------------------- |
+| `users`    | Informations des utilisateurs et propriétaires |
+| `rentals`  | Informations relatives aux locations           |
+| `messages` | Messages échangés entre utilisateurs           |
+
+### Relations
+
+- Un utilisateur peut posséder plusieurs locations.
+- Une location appartient à un utilisateur.
+- Une location peut recevoir plusieurs messages.
+- Un utilisateur peut envoyer plusieurs messages.
+- Chaque message est associé à un utilisateur et à une location.
+
+### Initialisation
+
+Le schéma initial de la base de données est fourni dans les ressources du projet OpenClassrooms.
+
+Pour initialiser la base :
+
+1. Créer une base de données nommée `chatop_db` dans MariaDB.
+2. Importer le fichier SQL fourni dans le dossier `ressources/sql` du repository.
+3. Configurer la variable `DATABASE_URL` dans le fichier `.env`.
+4. Générer le client Prisma :
 
 ```bash
-$ npm install @nestjs/observe
+npx prisma generate
 ```
 
-Then follow the [setup guide](https://docs.nestjs.com/observability/sdk) - it takes a single import and an app key.
+Le schéma Prisma est défini dans `prisma/schema.prisma`.
 
-The free plan needs no payment details and covers 300,000 events a month. You can also browse the [live demo](https://www.observe-demo.nestjs.com/dashboard) first - the whole dashboard over a busy service's data, with nothing to install.
+La configuration de Prisma 7 est définie dans `prisma.config.ts`.
 
-## Resources
+**À noter :** le projet utilise le schéma SQL initial fourni avec le projet OpenClassrooms. Aucune migration Prisma n'est actuellement utilisée.
 
-Check out a few resources that may come in handy when working with NestJS:
+---
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Auto-instrument your application with [NestJS Observe](https://observe.nestjs.com). Distributed tracing, metrics, and logging made easy. Error tracking and performance monitoring for your NestJS applications.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+## ▶️ Lancement du serveur
 
-## Support
+Depuis le dossier `backend` :
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### Mode développement
 
-## Stay in touch
+```bash
+npm run start:dev
+```
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+Le serveur démarre en mode développement avec rechargement automatique.
 
-## License
+### Mode production
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Compiler le projet :
+
+```bash
+npm run build
+```
+
+Démarrer le serveur :
+
+```bash
+npm run start:prod
+```
+
+Par défaut, l'API est accessible à l'adresse :
+
+http://localhost:3000
+
+---
+
+## 📖 Documentation API
+
+L'API est documentée avec **Swagger / OpenAPI** grâce au package `@nestjs/swagger`.
+
+Une fois le serveur démarré, la documentation interactive est accessible à l'adresse :
+
+**http://localhost:3000/api**
+
+Swagger permet de :
+
+- Consulter les routes disponibles.
+- Visualiser les paramètres et les DTOs attendus.
+- Consulter les réponses HTTP.
+- Tester directement les endpoints.
+- Renseigner un token JWT pour tester les routes protégées.
+
+---
+
+## 🔐 Authentification et sécurité
+
+L'API utilise une authentification basée sur **JWT (JSON Web Token)**.
+
+### Fonctionnement
+
+1. L'utilisateur crée un compte ou se connecte.
+2. Le serveur vérifie les identifiants.
+3. Le mot de passe est vérifié à partir de son hash stocké en base de données.
+4. En cas de connexion réussie, un token JWT est généré.
+5. Ce token doit être transmis dans l'en-tête `Authorization` pour accéder aux routes protégées.
+
+Format attendu :
+
+```text
+Authorization: Bearer <token>
+```
+
+### Mesures de sécurité
+
+- Hachage des mots de passe avec bcrypt.
+- Authentification JWT avec Passport.
+- Protection des routes privées à l'aide de Guards NestJS.
+- Validation des données entrantes avec class-validator.
+- Rejet des propriétés non autorisées dans les requêtes grâce à la configuration globale de `ValidationPipe`.
+- Utilisation de variables d'environnement pour les informations sensibles.
+
+---
+
+## 🏠 Routes disponibles
+
+Toutes les routes de l'API sont accessibles sous le préfixe `/api`.
+
+### Authentification
+
+| Méthode | Route                | Description                                          |
+| ------- | -------------------- | ---------------------------------------------------- |
+| POST    | `/api/auth/register` | Créer un compte utilisateur                          |
+| POST    | `/api/auth/login`    | Authentifier un utilisateur                          |
+| GET     | `/api/auth/me`       | Récupérer les informations de l'utilisateur connecté |
+
+### Locations
+
+| Méthode | Route              | Description                                |
+| ------- | ------------------ | ------------------------------------------ |
+| GET     | `/api/rentals`     | Récupérer toutes les locations             |
+| GET     | `/api/rentals/:id` | Récupérer une location par son identifiant |
+| POST    | `/api/rentals`     | Créer une location                         |
+| PUT     | `/api/rentals/:id` | Modifier une location                      |
+
+### Utilisateurs
+
+| Méthode | Route           | Description                                 |
+| ------- | --------------- | ------------------------------------------- |
+| GET     | `/api/user/:id` | Récupérer les informations d'un utilisateur |
+
+### Messages
+
+| Méthode | Route           | Description                                |
+| ------- | --------------- | ------------------------------------------ |
+| POST    | `/api/messages` | Envoyer un message concernant une location |
+
+Les détails des paramètres, des corps de requêtes, des réponses et des éventuelles erreurs HTTP sont consultables dans la documentation Swagger.
+
+---
+
+## 🧰 Commandes disponibles
+
+Les commandes suivantes sont définies dans le `package.json` du backend.
+
+| Commande              | Description                                             |
+| --------------------- | ------------------------------------------------------- |
+| `npm run start`       | Démarrer le serveur                                     |
+| `npm run start:dev`   | Démarrer en développement avec rechargement automatique |
+| `npm run start:debug` | Démarrer en mode debug                                  |
+| `npm run build`       | Compiler le projet                                      |
+| `npm run start:prod`  | Démarrer le serveur compilé                             |
+| `npm run format`      | Formater les fichiers TypeScript avec Prettier          |
+| `npm run lint`        | Analyser le code avec Oxlint                            |
+| `npx prisma generate` | Générer le client Prisma                                |
