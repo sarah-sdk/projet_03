@@ -15,6 +15,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
+  ApiBody,
   ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -102,6 +103,7 @@ export class RentalsController {
   @Post()
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: "Création d'une location" })
+  @ApiBody({ type: CreateRentalDto })
   @ApiCreatedResponse({
     description: 'Location créée avec succès',
     type: RentalResponseDto,
