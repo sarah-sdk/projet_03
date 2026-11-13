@@ -8,5 +8,6 @@ import { RentalsRepository } from './rentals.repository.js';
   imports: [PrismaModule],
   controllers: [RentalsController],
   providers: [RentalsService, RentalsRepository],
+  exports: [RentalsService],
 })
 export class RentalsModule {}
