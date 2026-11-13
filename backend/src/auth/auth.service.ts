@@ -68,12 +68,8 @@ export class AuthService {
     return this.#generateToken(user);
   }
 
-  async getMe(userId: number): Promise<AuthenticatedUser | null> {
-    const user = await this.usersService.findById(userId);
-
-    if (!user) {
-      return null;
-    }
+  async getMe(userId: number): Promise<AuthenticatedUser> {
+    const user = await this.usersService.findById(userId, userId);
 
     const { id, email, name } = user;
     return { id, email, name };

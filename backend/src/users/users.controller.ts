@@ -5,57 +5,30 @@ import {
   Param,
   ParseIntPipe,
   Query,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
-  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { UsersService } from './users.service.js';
 import { UserResponseDto } from './dto/user-response.dto.js';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
+import type { AuthenticatedRequest } from '../auth/types/authenticated-request.type.js';
 
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get()
-  @ApiOperation({ summary: 'Récupérer tous les utilisateurs' })
-  @ApiQuery({
-    name: 'search',
-    required: false,
-    type: String,
-    description: "Recherche sur le nom et l'email",
-  })
-  @ApiOkResponse({
-    description: 'Liste des utilisateurs récupérée avec succès',
-    type: UserResponseDto,
-    isArray: true,
-  })
-  async findAll(@Query('search') search?: string): Promise<UserResponseDto[]> {
-    const users = this.usersService.findAll({
-      where: search
-        ? {
-            OR: [
-              { name: { contains: search } },
-              { email: { contains: search } },
-            ],
-          }
-        : undefined,
-      orderBy: { id: 'asc' },
-    });
-
-    return (await users).map((user) => ({
-      id: user.id,
-      email: user.email,
-      name: user.name,
-    }));
-  }
-
   @Get(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Récupérer un utilisateur par son ID' })
   @ApiParam({
     name: 'id',
@@ -71,12 +44,9 @@ export class UsersController {
   })
   async findOne(
     @Param('id', ParseIntPipe) id: number,
-  ): Promise<UserResponseDto | null> {
-    const user = await this.usersService.findById(id);
-
-    if (!user) {
-      throw new NotFoundException('Utilisateur introuvable');
-    }
+    @Request() req: AuthenticatedRequest,
+  ): Promise<UserResponseDto> {
+    const user = await this.usersService.findById(id, req.user.id);
 
     return {
       id: user.id,

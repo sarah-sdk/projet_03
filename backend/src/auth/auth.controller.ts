@@ -100,12 +100,6 @@ export class AuthController {
     description: 'Utilisateur non authentifié ou token invalide',
   })
   async getMe(@Req() req: AuthenticatedRequest): Promise<UserResponseDto> {
-    const user = await this.authService.getMe(req.user.id);
-
-    if (!user) {
-      throw new NotFoundException('Utilisateur introuvable');
-    }
-
-    return user;
+    return this.authService.getMe(req.user.id);
   }
 }
