@@ -1,10 +1,8 @@
 import {
   Controller,
   Get,
-  NotFoundException,
   Param,
   ParseIntPipe,
-  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';

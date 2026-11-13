@@ -3,7 +3,6 @@ import {
   Controller,
   Get,
   HttpCode,
-  NotFoundException,
   Post,
   Req,
   UseGuards,
@@ -16,6 +15,7 @@ import {
   ApiBody,
   ApiConflictResponse,
   ApiCreatedResponse,
+  ApiForbiddenResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -31,11 +31,13 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
+  @HttpCode(200)
   @ApiOperation({
     summary: 'Inscription',
     description: 'Permet de créer un nouvel utilisateur',
   })
-  @ApiCreatedResponse({
+  @ApiBody({ type: RegisterDto })
+  @ApiOkResponse({
     description: 'Utilisateur créé avec succès',
     schema: {
       example: {
@@ -50,8 +52,8 @@ export class AuthController {
     return this.authService.register(registerDto);
   }
 
-  @UseGuards(LocalAuthGuard)
   @Post('login')
+  @UseGuards(LocalAuthGuard)
   @HttpCode(200)
   @ApiOperation({
     summary: 'Connexion',
@@ -99,6 +101,7 @@ export class AuthController {
   @ApiUnauthorizedResponse({
     description: 'Utilisateur non authentifié ou token invalide',
   })
+  @ApiForbiddenResponse({})
   async getMe(@Req() req: AuthenticatedRequest): Promise<UserResponseDto> {
     return this.authService.getMe(req.user.id);
   }

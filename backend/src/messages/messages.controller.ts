@@ -9,10 +9,12 @@ import {
   ApiBody,
   ApiCreatedResponse,
   ApiOperation,
+  ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { MessageResponseDto } from './dto/message-response.dto.js';
 
+@ApiTags('Messages')
 @Controller('messages')
 export class MessagesController {
   constructor(private readonly messagesService: MessagesService) {}
